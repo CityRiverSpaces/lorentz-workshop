@@ -1,0 +1,66 @@
+---
+title: "CRiSp Use Case: [Title of use case]"
+format: html
+---
+
+```{r}
+#| label: setup
+
+# remotes::install_github("CityRiverSpaces/CRiSp")
+library(CRiSp)
+```
+
+## Introduction
+
+- Choose 1-2 use cases from Day 1
+- Choose 1-2 methods of analysis from Day 2
+
+Describe in one paragraph your use case, including the following information:
+
+- the discipline or domain of application
+- the research question, objective or assignment
+- the choice for single- or cross-case analysis
+- conceptual, data-related or analytical challenges
+
+Describe the method(s) of analysis you chose to answer your question or repspond to the assignment.
+
+### Location
+
+Set location
+
+```{r}
+city_name <- "Bucharest"
+river_name <- "Dâmbovița"
+```
+
+Get OSM data for visualisation
+
+```{r}
+bb <- get_osm_bb(city_name)
+crs <- get_utm_zone(bb)
+streets <- get_osm_streets(bb, crs)
+railways <- get_osm_railways(bb, crs)
+```
+
+## Delineation
+
+```{r}
+cr <- delineate(city_name, river_name,
+                segments = TRUE,
+                riverspace = TRUE)
+```
+
+```{r}
+plot(cr$corridor, lwd = 3, border = "orange")
+plot(cr$riverspace, col = "green", border = NA,  add = TRUE)
+plot(streets$geometry, lwd = 0.5, add = TRUE)
+plot(railways$geometry, lwd = 0.5, add = TRUE)
+plot(cr$corridor, add = TRUE, lwd = 3, border = "orange")
+plot(cr$segments, add = TRUE, border = "orange")
+```
+
+## Analysis
+
+- Load a layer or set of layers of interest
+- Carry out some spatial analysis
+- Discuss the implications of using the areas delineated by CRiSp for the analysis
