@@ -6,5 +6,7 @@ To see a rendered version of the **CRiSp demo notebook**, go to [https://cityriv
 
 To use the **CRiSp use case notebook**, follow these steps:
 
-1. Clone this repository
-2. Make a copy of the file [usecase.qmd](usecase.qmd) and rename it to `usecase-TYPE-CASE.qmd`. Replace `TYPE` with `single` or `multiple`, and `CASE` with `CITY_NAME-RIVER_NAME` and `CITY_RIVER_SET_NAME`, respectively.
+1. Fork this repository;
+2. Make a copy of the file [usecase.qmd](usecase.qmd) and rename it to `usecase-TYPE-CASE.qmd` by replacing `TYPE` with `single` or `multiple`, and `CASE` with `CITY_NAME-RIVER_NAME` and `CITY_RIVER_SET_NAME`, respectively;
+3. Fill in the template with your use case;
+4. Open a Pull Request on the workshop repository to submit your use case and share any issues you encountered while implementing it in the notebook.
