@@ -12,17 +12,14 @@ library(CRiSp)
 
 ## Introduction
 
-- Choose 1-2 use cases from Day 1
-- Choose 1-2 methods of analysis from Day 2
-
-Describe in one paragraph your use case, including the following information:
+Choose one use case from Day 1 and describe it in one paragraph, including the following information:
 
 - the discipline or domain of application
 - the research question, objective or assignment
 - the choice for single- or cross-case analysis
 - conceptual, data-related or analytical challenges
 
-Describe the method(s) of analysis you chose to answer your question or repspond to the assignment.
+Choose one (or more) method(s) of analysis from Day 2 and describe why you chose it/them to answer your question or respond to the assignment.
 
 ### Location
 
