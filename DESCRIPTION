@@ -1,0 +1,17 @@
+Package: lorentz-workshop
+Title: Notebooks for the workshop "Tracing Sustainable Urban River Space Transformations"
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Claudiu", "Forgaci", , "c.forgaci@tudelft.nl", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0003-3218-5102")),
+    person("Francesco", "Nattino", , "f.nattino@esciencecenter.nl", role = c("aut"),
+           comment = c(ORCID = "0000-0003-3286-0139")),
+    person("Netherlands eScience Center", , , "info@esciencecenter.nl", role = "fnd")
+    )
+Description: This repository contains the computational notebooks used in the
+    "Tracing Sustainable Urban River Space Transformations" workshop on 9 April
+    at Lorentz Center @lambda.
+License: Apache License (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
