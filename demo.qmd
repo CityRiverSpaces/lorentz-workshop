@@ -1,4 +1,227 @@
 ---
-title: "CRiSp demo"
+title: "CRiSp demonstration"
 format: html
+bibliography: references.bib
+csl: apa.csl
 ---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE
+)
+```
+
+## Introduction and setup
+
+CRiSp implements a spatial morphological method of delineation [@forgaci2018] that considers both the terrain of the river valley and the configuration of the urban fabric.
+
+```{r}
+library(CRiSp)
+```
+
+CRiSp has as main dependencies the core R geospatial libraries:
+
+* [sf](https://r-spatial.github.io/sf/) - vector dataset handling
+* [terra](https://rspatial.github.io/terra/) - raster dataset handling
+
+```{r, message=FALSE}
+library(sf)
+library(terra)
+```
+
+Other relevant CRiSp dependencies and libraries that are used in this notebook are:
+
+* [sfnetworks](https://luukvdmeer.github.io/sfnetworks/) - (geo)spatial networks handling and manipulation;
+* [osmdata](https://docs.ropensci.org/osmdata/) - access OpenStreetMap data via the Overpass API;
+* ([leaflet](https://rstudio.github.io/leaflet/) - interactive visualization of geospatial datasets.)
+
+A few utility functions have been implemented as part of a separate file, and imported here:
+
+```{r}
+source("utils.R")
+```
+
+## Delineate in one shot!
+
+The three types of morphological delineations implemented in CRiSp - **corridor**, **segments**, and **river space** - can be carried out via the `delineate` function, which works as main access point to the package.
+
+We define the name of the city and of the river that define our Area of Interest (AoI):
+
+```{r}
+city_name <- "Bucharest"
+river_name <- "Dâmbovița"
+```
+
+Let us run the three delineations:
+
+```{r}
+delineations <- delineate(
+  city_name,
+  river_name,
+  corridor = TRUE,
+  segments = TRUE,
+  riverspace = TRUE
+)
+```
+
+and visualize results. First, the urban **corridor** surrounding the river, delineated on the street network along a path that is closest to the valley edge:
+
+```{r}
+visualize(delineations$corridor)
+```
+
+
+Then, the corridor **segments**, bounded by the main transversal streets:
+
+```{r}
+visualize(delineations$segments)
+```
+
+
+Finally, the **river space**, i.e. the space between the river and the first line of buildings:
+
+```{r}
+visualize(delineations$riverspace)
+```
+
+
+A number of optional arguments can be specified as input to the `delineate` function - see [documentation page](https://cityriverspaces.github.io/CRiSp/reference/delineate.html). For even more custom setups, one can run each step of the delineation independently.
+
+## Step by step
+
+Let us go through the steps that are internally run by the CRiSp function `delineate`. These are:
+
+1. Downloading the relevant datasets;
+2. Valley delineation;
+3. Corridor delineation;
+4. Corridor segmentation;
+5. River space delineation.
+
+### 1. Getting the data
+
+Default data sources in CRiSp are:
+
+* [OpenStreetMap](https://www.openstreetmap.org/) (OSM) for city boundaries, street & rail network, river geometry, buildings;
+* [GLO-30 Copernicus Digital Elevation Model (DEM)](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) for the representation of the topographic surface of the area.
+
+but any other data sources can be used as well!
+
+CRiSp has the following built in functions that allows one to retrieve the required data from OSM. `network_buffer` and `buildings_buffer` define the size of the buffer regions around the river to retrieve network data (i.e. streets and railways) and building data, respectively:
+
+```{r}
+network_buffer <- 2500 # in meters
+buildings_buffer <- 100 # in meters
+
+osmdata <- get_osmdata(
+  city_name,
+  river_name,
+  network_buffer = network_buffer,
+  buildings_buffer = buildings_buffer,
+)
+```
+
+The list `osmdata` contains the following assets:
+
+```{r}
+names(osmdata)
+```
+
+Let us visualize e.g. the streets:
+
+```{r}
+visualize(osmdata$streets)
+```
+
+
+and the river surface and its center line:
+
+```{r}
+visualize(osmdata$river_centerline, osmdata$river_surface)
+```
+
+
+For the Copernicus DEM, we consider a slightly larger area of interest (AoI) than what used to retrieve network data. The valley boundary delineation can in fact create some artifacts close to the DEM raster edges - it is "safer" to add some extra space around the actual AoI:
+
+```{r}
+dem_buffer <- 2500 # in meters
+crs <- st_crs(osmdata$river_centerline)
+aoi_dem <- st_buffer(osmdata$aoi_network, dem_buffer)
+dem <- get_dem(aoi_dem, crs = crs)
+```
+
+Let us visualize the retrived DEM, together with the river centerline:
+
+```{r}
+visualize(dem, osmdata$river_centerline)
+```
+
+### 2. Valley delineation
+
+In a typical CRiSp workflow, the valley delineation is used in the context of corridor delineation. First, the river valley is extracted from the DEM, and then the resulting valley edge is used to “guide” the delineation of the corridor on the street network.
+
+The valley delineation is carried out via a cost distance algorithm, variants of which are mostly used for the delineation of wet area mapping and valley bottom delineation in non-urban contexts[@agren2014; @murphy2009; @white2012].
+
+Valley delineation is carried out in the following way. Note that we use the combined geometry of the river surface and its center line as target geometry (where to compute cost-distance to):
+
+```{r}
+river <- c(osmdata$river_centerline, osmdata$river_surface)
+valley <- delineate_valley(dem, river)
+```
+
+Let us visualize the valley edge, together with the river center line and the DEM:
+
+```{r}
+visualize(dem, st_boundary(valley), osmdata$river_centerline)
+```
+
+### 3. Corridor delineation
+
+```{r}
+network_edges <- c(osmdata$streets$geometry, osmdata$railway$geometry)
+network <- as_network(network_edges, clean = TRUE, flatten = TRUE)
+```
+```{r}
+corridor <- delineate_corridor(
+  network,
+  osmdata$river_centerline,
+  osmdata$river_surface,
+  dem = dem,
+  max_width = network_buffer
+)
+```
+
+```{r}
+visualize(corridor)
+```
+
+### 4. Corridor segmentation
+
+```{r}
+network_filtered <- filter_network(network, corridor, buffer = 100)
+```
+
+```{r}
+segments <- delineate_segments(
+    corridor,
+    network_filtered,
+    osmdata$river_centerline
+)
+```
+
+```{r}
+visualize(segments)
+```
+
+### 5. River space delineation
+
+We use again the combined geometry of the river surface and its center line as source for the viewpoints:
+
+```{r}
+riverspace <- delineate_riverspace(osmdata$river_surface, osmdata$buildings)
+```
+
+```{r}
+visualize(riverspace)
+```
