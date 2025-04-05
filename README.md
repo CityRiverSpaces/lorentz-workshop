@@ -2,20 +2,27 @@
 
 This repository contains the computational notebooks used in the workshop ["Tracing Sustainable Urban River Space Transformations"](https://www.lorentzcenter.nl/tracing-sustainable-urban-river-space-transformations.html) on 9 April at Lorentz Center @lambda.
 
+GitHub repository: [CityRiverSpaces/lorentz-workshop](https://github.com/CityRiverSpaces/lorentz-workshop)
+
 ## Demo notebook
 
 A rendered version of the **CRiSp demo notebook** is available at the URL: <https://cityriverspaces.github.io/lorentz-workshop/demo.html>
 
 In order to run the notebook live:
 
-1. Clone and access this repository. You can do it from RStudio, by selecting the menu `File` > `Version Control` > `Git`, then pasting the following link as `Repository URL`: <https://github.com/CityRiverSpaces/lorentz-workshop.git> (you can leave the field `Project directory name` empy).
-2. If you are working on the shared RStudio Server, all dependencies should already be installed, so you can move on to point 4.
-3. If you are working on your local machine, we recommend to install dependencies in a local R environment, which can be created by typing in the R console:
+1. Clone and access this repository. You can do it from RStudio:
+   * From the "Project" menu (top right), select `Create Project` > `Version Control` > `Git`
+   * Paste the following URL as `Repository URL`: <https://github.com/CityRiverSpaces/lorentz-workshop.git> and select the path where you want to create the project directory (you can leave the field `Project directory name` empy).
+   * Click on `Create Project`
+3. If you are working on the shared RStudio Server, all dependencies should already be installed, so you can move on to point 4.
+4. If you are working on your local machine, we recommend to install dependencies in a local R environment, which can be created by typing in the R console:
     ```r
+    # install.packages("renv")
     renv::init()
+    renv::install()
     ```
     When prompted for input, type `1` (i.e. `Use only the DESCRIPTION file`).
-4. Open the file `demo.qmd`. You can run cells individually with the play button or render the full notebook with the `Render` button (blue arrow symbol).
+5. Open the file `demo.qmd`. You can run cells individually with the play button or render the full notebook with the `Render` button (blue arrow symbol on top of the `demo.qmd` panel).
 
 ## Develop a custom use-case notebook
 
