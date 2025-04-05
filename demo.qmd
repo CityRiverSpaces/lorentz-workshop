@@ -67,13 +67,15 @@ Done! Let us visualize the results. `delineations` is a list, which contains:
 visualize(delineations$corridor)
 ```
 
-2.  The corridor **segments**, bounded by the main transversal streets:
+
+2\.  The corridor **segments**, bounded by the main transversal streets:
 
 ```{r}
 visualize(delineations$segments)
 ```
 
-3.  The **river space**, i.e. the space between the river and the first line of buildings:
+
+3\.  The **river space**, i.e. the space between the river and the first line of buildings:
 
 ```{r}
 visualize(delineations$riverspace)
